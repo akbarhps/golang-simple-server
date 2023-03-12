@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
 	"time"
 )
@@ -19,31 +21,31 @@ func getConnection(config *Config) (*sql.DB, error) {
 	db.SetConnMaxIdleTime(10 * time.Minute)
 	db.SetConnMaxLifetime(60 * time.Minute)
 
-	driver, err := mysql.WithInstance(db, &mysql.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	m, err := migrate.NewWithDatabaseInstance(config.DBMigrationSource, config.DBDriver, driver)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := m.Steps(2); err != nil {
-		return nil, err
-	}
-
 	return db, nil
 }
 
 func main() {
 	config, err := loadConfig(".")
 	if err != nil {
-		log.Fatal("error read config:", err)
+		log.Fatal("error read config: ", err)
 	}
 
-	_, err = getConnection(&config)
+	db, err := getConnection(&config)
 	if err != nil {
-		log.Fatal("error get connection:", err)
+		log.Fatal("error get connection: ", err)
+	}
+
+	driver, err := mysql.WithInstance(db, &mysql.Config{})
+	if err != nil {
+		log.Fatal("error get sql instance: ", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(config.DBMigrationSource, config.DBDriver, driver)
+	if err != nil {
+		log.Fatal("error create migrate instance: ", err)
+	}
+
+	if err := m.Up(); err != nil {
+		log.Println("error migrating: ", err)
 	}
 }
