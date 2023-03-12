@@ -25,15 +25,19 @@ func getConnection(config *Config) (*sql.DB, error) {
 }
 
 func main() {
+	log.Println("Starting application...")
+
 	config, err := loadConfig(".")
 	if err != nil {
 		log.Fatal("error read config: ", err)
 	}
+	log.Println("config loaded: ", config)
 
 	db, err := getConnection(&config)
 	if err != nil {
 		log.Fatal("error get connection: ", err)
 	}
+	log.Println("success create database connection")
 
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
 	if err != nil {
