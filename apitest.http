@@ -1,0 +1,13 @@
+### Test create mahasiswa
+POST http://localhost:3000/api/v1/mahasiswa
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "test",
+  "nik": "1234567890",
+  "religion": "Lainnya",
+  "gender": "L",
+  "date_of_birth": "2021-01-01",
+  "address": "test"
+}

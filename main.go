@@ -3,11 +3,13 @@ package main
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gofiber/fiber/v2"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
 	"time"
+	"vps_server_playground/domain/mahasiswa"
 )
 
 func getConnection(config *Config) (*sql.DB, error) {
@@ -31,13 +33,11 @@ func main() {
 	if err != nil {
 		log.Fatal("error read config: ", err)
 	}
-	log.Println("config loaded: ", config)
 
 	db, err := getConnection(&config)
 	if err != nil {
 		log.Fatal("error get connection: ", err)
 	}
-	log.Println("success create database connection")
 
 	driver, err := mysql.WithInstance(db, &mysql.Config{})
 	if err != nil {
@@ -52,4 +52,24 @@ func main() {
 	if err := m.Up(); err != nil {
 		log.Println("error migrating: ", err)
 	}
+
+	mhsRepository := mahasiswa.NewRepository(db)
+	mhsService := mahasiswa.NewService(mhsRepository)
+	mhsController := mahasiswa.NewController(mhsService)
+
+	app := fiber.New()
+
+	//app.Get("/", func(ctx *fiber.Ctx) error {
+	//	return ctx.JSON(fiber.Map{
+	//		"message": "Hello, World!",
+	//	})
+	//})
+	app.Get("/api", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
+
+	v1Group := app.Group("/api/v1")
+	v1Group.Post("/mahasiswa", mhsController.CreateMahasiswa)
+
+	log.Fatalln(app.Listen(":3000"))
 }
