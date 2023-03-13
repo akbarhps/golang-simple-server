@@ -60,7 +60,7 @@ func main() {
 
 	app := fiber.New()
 
-	app.Get("/metrics", monitor.New(monitor.Config{Title: "MyService Metrics Page"}))
+	app.Get("/metrics", monitor.New(monitor.Config{Title: "Metrics"}))
 
 	app.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.JSON(fiber.Map{
