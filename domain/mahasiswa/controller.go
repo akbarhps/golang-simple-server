@@ -10,6 +10,7 @@ import (
 
 type Controller interface {
 	CreateMahasiswa(ctx *fiber.Ctx) error
+	GetMahasiswaByID(ctx *fiber.Ctx) error
 }
 
 type controllerImpl struct {
@@ -37,7 +38,24 @@ func (c *controllerImpl) CreateMahasiswa(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusCreated).JSON(&util.WebResponse{
 		StatusCode: http.StatusCreated,
-		Status:     "create mahasiswa success",
+		Status:     "created",
+		Data:       mhs,
+	})
+}
+
+func (c *controllerImpl) GetMahasiswaByID(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	serviceCtx := context.Background()
+
+	mhs, err := c.service.GetByID(serviceCtx, id)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(http.StatusOK).JSON(&util.WebResponse{
+		StatusCode: http.StatusOK,
+		Status:     "ok",
 		Data:       mhs,
 	})
 }

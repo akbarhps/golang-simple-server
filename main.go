@@ -4,7 +4,10 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -60,6 +63,10 @@ func main() {
 
 	app := fiber.New()
 
+	app.Use(cors.New())
+	app.Use(logger.New())
+	app.Use(pprof.New())
+
 	app.Get("/metrics", monitor.New(monitor.Config{Title: "Metrics"}))
 
 	app.Get("/", func(ctx *fiber.Ctx) error {
@@ -70,6 +77,7 @@ func main() {
 
 	v1Group := app.Group("/api/v1")
 	v1Group.Post("/mahasiswa", mhsController.CreateMahasiswa)
+	v1Group.Post("/mahasiswa/:id", mhsController.GetMahasiswaByID)
 
 	log.Fatalln(app.Listen(config.ServerAddress))
 }

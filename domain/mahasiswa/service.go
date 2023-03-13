@@ -8,6 +8,7 @@ import (
 
 type Service interface {
 	Create(ctx context.Context, req *createRequest) (*Mahasiswa, error)
+	GetByID(ctx context.Context, id string) (*Mahasiswa, error)
 }
 
 type serviceImpl struct {
@@ -19,8 +20,15 @@ func NewService(repository Repository) Service {
 }
 
 func (s *serviceImpl) Create(ctx context.Context, req *createRequest) (*Mahasiswa, error) {
-	id, _ := uuid.NewV4()
-	date, _ := time.Parse("2006-01-02", req.DateOfBirth)
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
+	date, err := time.Parse("2006-01-02", req.DateOfBirth)
+	if err != nil {
+		return nil, err
+	}
 
 	mhs := &Mahasiswa{
 		ID:          id.String(),
@@ -32,7 +40,13 @@ func (s *serviceImpl) Create(ctx context.Context, req *createRequest) (*Mahasisw
 		Address:     req.Address,
 	}
 
-	s.repository.Create(ctx, mhs)
+	if err = s.repository.Create(ctx, mhs); err != nil {
+		return nil, err
+	}
 
 	return mhs, nil
+}
+
+func (s *serviceImpl) GetByID(ctx context.Context, id string) (*Mahasiswa, error) {
+	return s.repository.GetByID(ctx, id)
 }
