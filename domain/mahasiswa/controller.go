@@ -21,39 +21,39 @@ func NewController(service Service) Controller {
 	return &controllerImpl{service}
 }
 
-func (c *controllerImpl) CreateMahasiswa(ctx *fiber.Ctx) error {
-	req := new(createRequest)
-	if err := ctx.BodyParser(req); err != nil {
+func (c *controllerImpl) CreateMahasiswa(req *fiber.Ctx) error {
+	createReq := new(createRequest)
+	if err := req.BodyParser(createReq); err != nil {
 		return err
 	}
-
-	log.Println("req: ", req)
-
-	serviceCtx := context.Background()
-
-	mhs, err := c.service.Create(serviceCtx, req)
+	log.Println(createReq)
+	ctx := context.Background()
+	mhs, err := c.service.Create(ctx, createReq)
 	if err != nil {
 		return err
 	}
-
-	return ctx.Status(http.StatusCreated).JSON(&util.WebResponse{
+	return req.Status(http.StatusCreated).JSON(&util.WebResponse{
 		StatusCode: http.StatusCreated,
 		Status:     "created",
 		Data:       mhs,
 	})
 }
 
-func (c *controllerImpl) GetMahasiswaByID(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
-
-	serviceCtx := context.Background()
-
-	mhs, err := c.service.GetByID(serviceCtx, id)
+func (c *controllerImpl) GetMahasiswaByID(req *fiber.Ctx) error {
+	id := req.Params("id")
+	ctx := context.Background()
+	mhs, err := c.service.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
-
-	return ctx.Status(http.StatusOK).JSON(&util.WebResponse{
+	if mhs == nil {
+		return req.Status(http.StatusNotFound).JSON(&util.WebResponse{
+			StatusCode: http.StatusNotFound,
+			Status:     "not found",
+			Data:       nil,
+		})
+	}
+	return req.Status(http.StatusOK).JSON(&util.WebResponse{
 		StatusCode: http.StatusOK,
 		Status:     "ok",
 		Data:       mhs,
