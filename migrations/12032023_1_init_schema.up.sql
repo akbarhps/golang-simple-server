@@ -35,13 +35,13 @@ create table program_studi
 
 create table biodata_mahasiswa
 (
-    id            varchar(36)                                             not null primary key,
-    nama          varchar(50)                                             not null,
-    nik           varchar(16)                                             not null,
-    agama         enum ('Islam', 'Kristen', 'Budha', 'Hindu', 'Konghucu') not null,
-    jenis_kelamin enum ('L', 'P')                                         not null,
-    tanggal_lahir date                                                    not null,
-    alamat        text                                                    not null
+    id            varchar(36)                                                                   not null primary key,
+    nama          varchar(50)                                                                   not null,
+    nik           varchar(16)                                                                   not null,
+    agama         enum ('Islam', 'Kristen', 'Katolik','Protestan','Budha', 'Hindu', 'Konghucu') not null,
+    jenis_kelamin enum ('L', 'P')                                                               not null,
+    tanggal_lahir date                                                                          not null,
+    alamat        text                                                                          not null
 ) engine = INNODB;
 
 create table email_mahasiswa

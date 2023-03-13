@@ -59,17 +59,14 @@ func main() {
 
 	app := fiber.New()
 
-	//app.Get("/", func(ctx *fiber.Ctx) error {
-	//	return ctx.JSON(fiber.Map{
-	//		"message": "Hello, World!",
-	//	})
-	//})
-	app.Get("/api", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{
+			"message": "Hello, World!",
+		})
 	})
 
 	v1Group := app.Group("/api/v1")
 	v1Group.Post("/mahasiswa", mhsController.CreateMahasiswa)
 
-	log.Fatalln(app.Listen(":3000"))
+	log.Fatalln(app.Listen(config.ServerAddress))
 }
