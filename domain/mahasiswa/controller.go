@@ -3,7 +3,6 @@ package mahasiswa
 import (
 	"context"
 	"github.com/gofiber/fiber/v2"
-	"log"
 	"net/http"
 	"vps_server_playground/util"
 )
@@ -26,7 +25,6 @@ func (c *controllerImpl) CreateMahasiswa(req *fiber.Ctx) error {
 	if err := req.BodyParser(createReq); err != nil {
 		return err
 	}
-	log.Println(createReq)
 	ctx := context.Background()
 	mhs, err := c.service.Create(ctx, createReq)
 	if err != nil {
